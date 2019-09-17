@@ -3,12 +3,51 @@ import math
 
 print("CS 691 - Project 1 - Decision Trees")
 print("Lee Easson")
-print("")
+print("Kurtis Rodrigue")
+print()
+
+class Node:
+    def __init__(self, value):
+        self.left = None
+        self.right = None
+        self.value = value
+
+class Binary_Tree:
+    def __init__(self):
+        self.root = None
+
+    def add(self, value):
+        if self.root == None:
+            self.root = Node(value)
+        else:
+            self.add_node(value, self.root)
+
+    def add_node(self, value, node):
+        if value < node.value:
+            if node.left is not None:
+                self.add_node(value, node.left)
+            else:
+                node.left = Node(value)
+        else:
+            if node.right is not None:
+                self.add_node(value, node.right)
+            else:
+                node.right = Node(value)
+
+    def print_tree(self):
+        if self.root is not None:
+            self.print_nodes(self.root)
+
+    def print_nodes(self, node):
+        if node is not None:
+            self.print_nodes(node.left)
+            print(str(node.value) + ' ')
+            self.print_nodes(node.right)
 
 def calculate_entropy(Y):
     # Set of all labels
-    labels = (0,1)
-    # Length of training labels
+    labels = (0, 1)
+    # Number of training labels
     length = Y.shape[0]
 
     # Calculate number of each label
@@ -24,29 +63,35 @@ def calculate_entropy(Y):
             + (-1 * prop_labels_1 * math.log(prop_labels_1))
     return entropy
 
-def calculate_information_gain(X, Y):
-    # Calculate entropy of entire dataset
-    H = calculate_entropy(Y)
-    print(H)
-    return 0
-
 def DT_train_binary(X, Y, max_depth):
     # Check if X any Y have same number of rows
     # Return 0 if unequal row number
     if X.shape[0] != Y.shape[0]:
         return 0
-    # If max_depth is -1, create most accurate tree
-    if (max_depth == -1):
-        return
-    # Otherwise, create tree with max_depth
-    
+
+    # Create new Binary Tree for DT
+    DT = Binary_Tree()
+
+    # Calculate entropy of entire dataset
+    H = calculate_entropy(Y)
+
+    # Split training data at each feature
+    for row in X:
+        print(row[0])
+
+        # Calculate Information Gain at each split
+        
+        # Choose split based on maximum IG
+        
+    # Return DT as list of lists, numpy array, or class object
+    return DT
 
 def DT_test_binary(X, Y, DT):
     return 0
 
+
 def DT_train_binary_best(X_train, Y_train, X_val, Y_val):
     return
-
 
 def DT_train_real(X, Y, max_depth):
     return
@@ -69,7 +114,5 @@ training_labels = np.array([ [1], [1], [0] ])
 max_depth = 2
 
 # Test DT_train_binary() and DT_test_binary()
-#DT = DT_train_binary(training_features, training_labels, max_depth)
-#test_acc = DT_test_binary(training_features, training_labels, DT)
-
-calculate_information_gain(training_features, training_labels)
+DT = DT_train_binary(training_features, training_labels, max_depth)
+test_acc = DT_test_binary(training_features, training_labels, DT)
