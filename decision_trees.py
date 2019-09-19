@@ -7,32 +7,36 @@ print("Kurtis Rodrigue")
 print()
 
 class Node:
-    def __init__(self, value):
+    def __init__(self, value, depth):
         self.left = None
         self.right = None
         self.value = value
+        self.depth = depth
 
 class Binary_Tree:
     def __init__(self):
         self.root = None
+        self.depth = 0
 
     def add(self, value):
         if self.root == None:
-            self.root = Node(value)
+            self.root = Node(value, 0)
         else:
             self.add_node(value, self.root)
 
     def add_node(self, value, node):
         if value < node.value:
             if node.left is not None:
+                self.depth += 1
                 self.add_node(value, node.left)
             else:
-                node.left = Node(value)
+                node.left = Node(value, self.depth)
         else:
             if node.right is not None:
+                self.depth += 1
                 self.add_node(value, node.right)
             else:
-                node.right = Node(value)
+                node.right = Node(value, self.depth)
 
     def print_tree(self):
         if self.root is not None:
@@ -64,8 +68,13 @@ def calculate_entropy(Y):
     return entropy
 
 def DT_train_binary(X, Y, max_depth):
-    # Check if X any Y have same number of rows
-    # Return 0 if unequal row number
+    # Number of samples in training data
+    num_samples = X.shape[0]
+    # Number of features in training data
+    num_features = X.shape[1]
+        
+    # Check if X any Y have same number of samples
+    # Return 0 if unequal sample number
     if X.shape[0] != Y.shape[0]:
         return 0
 
@@ -74,14 +83,16 @@ def DT_train_binary(X, Y, max_depth):
 
     # Calculate entropy of entire dataset
     H = calculate_entropy(Y)
-
-    # Split training data at each feature
-    for row in X:
-        print(row[0])
+    
+    # Greedy algorithm
+    for sample in X:
+        # Split training data at each feature
+        print(sample[0],sample[1],sample[2],sample[3],"|")
 
         # Calculate Information Gain at each split
         
         # Choose split based on maximum IG
+
         
     # Return DT as list of lists, numpy array, or class object
     return DT
@@ -89,9 +100,9 @@ def DT_train_binary(X, Y, max_depth):
 def DT_test_binary(X, Y, DT):
     return 0
 
-
 def DT_train_binary_best(X_train, Y_train, X_val, Y_val):
     return
+
 
 def DT_train_real(X, Y, max_depth):
     return
@@ -101,6 +112,7 @@ def DT_test_real(X, Y, DT):
 
 def DT_train_real_best(X_train, Y_train, X_val, Y_val):
     return
+
 
 # Test Data
 '''
