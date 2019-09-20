@@ -7,36 +7,34 @@ print("Kurtis Rodrigue")
 print()
 
 class Node:
-    def __init__(self, value, depth):
+    def __init__(self, value, IG):
         self.left = None
         self.right = None
         self.value = value
-        self.depth = depth
+        self.IG = IG
 
 class Binary_Tree:
     def __init__(self):
         self.root = None
         self.depth = 0
 
-    def add(self, value):
+    def add(self, value, IG):
         if self.root == None:
-            self.root = Node(value, 0)
+            self.root = Node(value, IG)
         else:
-            self.add_node(value, self.root)
+            self.add_node(value, IG, self.root)
 
-    def add_node(self, value, node):
+    def add_node(self, value, IG, node):
         if value < node.value:
             if node.left is not None:
-                self.depth += 1
-                self.add_node(value, node.left)
+                self.add_node(value, IG, node.left)
             else:
-                node.left = Node(value, self.depth)
+                node.left = Node(value, IG)
         else:
             if node.right is not None:
-                self.depth += 1
-                self.add_node(value, node.right)
+                self.add_node(value, IG, node.right)
             else:
-                node.right = Node(value, self.depth)
+                node.right = Node(value, IG)
 
     def print_tree(self):
         if self.root is not None:
@@ -45,7 +43,7 @@ class Binary_Tree:
     def print_nodes(self, node):
         if node is not None:
             self.print_nodes(node.left)
-            print(str(node.value) + ' ')
+            print(str(node.value) + ' ' + str(node.IG) + ' ')
             self.print_nodes(node.right)
 
 def calculate_entropy(Y):
@@ -113,16 +111,15 @@ def calculate_feature_entropy(feature, labels, binary_value):
 
         return H_1
 
+
 def DT_train_binary(X, Y, max_depth):
-    # Number of samples in training data
+    # Number of samples and features in training data
     num_samples = X.shape[0]
-    # Number of features in training data
     num_features = X.shape[1]
 
     # Check if X any Y have same number of samples
     # Return 0 if unequal sample number
-    if X.shape[0] != Y.shape[0]:
-        return 0
+    if X.shape[0] != Y.shape[0]: return 0
 
     # Create new Binary Tree for DT
     DT = Binary_Tree()
@@ -132,10 +129,16 @@ def DT_train_binary(X, Y, max_depth):
 
     # Create numpy array for Labels
     labels = np.zeros(shape=(num_samples))
-    for sample in Y:
-        labels[sample] = Y[sample]
+    for sample in Y: labels[sample] = Y[sample]
 
-    # Greedy algorithm
+    # GREEDY ALGORITHM
+
+    # Initialize dictionary for storing IG 
+    # of each feature and current index of feature
+    Feature_IG = dict.fromkeys(list(range(1, num_features+1, 1)))
+    current_index = 1
+
+    # Iterate through features and calculate IG for each
     for feature in range(num_features):
         # Create empty numpy array for storing
         # the samples of the current feature
@@ -166,8 +169,20 @@ def DT_train_binary(X, Y, max_depth):
         print("IG:",IG)
         print()
 
-    # Find maximum IG
-        
+        # Update feature IG dictionary and current index
+        Feature_IG[current_index] = IG
+        current_index += 1
+
+    # Find feature with maximum IG
+    print(Feature_IG)
+    Max_IG = max(Feature_IG.values())
+    Max_feature = [k for k,v in Feature_IG.items() if v == Max_IG]
+    print(Max_feature, Max_IG)
+    print()
+
+    # Add feature with maximum IG to DT
+    DT.add("F"+str(Max_feature), Max_IG)
+
     # Return DT as list of lists, numpy array, or class object
     return DT
 
@@ -201,4 +216,5 @@ max_depth = 2
 
 # Test DT_train_binary() and DT_test_binary()
 DT = DT_train_binary(training_features, training_labels, max_depth)
+DT.print_tree()
 test_acc = DT_test_binary(training_features, training_labels, DT)
