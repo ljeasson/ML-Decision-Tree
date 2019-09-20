@@ -63,16 +63,62 @@ def calculate_entropy(Y):
     prop_labels_1 = num_labels_1 / length
     
     # Calculate entropy
-    entropy = (-1 * prop_labels_0 * math.log(prop_labels_0)) \
-            + (-1 * prop_labels_1 * math.log(prop_labels_1))
+    entropy = (-1 * prop_labels_0 * math.log2(prop_labels_0)) \
+            + (-1 * prop_labels_1 * math.log2(prop_labels_1))
     return entropy
+
+def calculate_feature_entropy(feature, labels, binary_value):
+    # Count of 0s and 1s respectively
+    num_0 = 0
+    num_1 = 0
+    # Proportion of 0s and 1s respectively
+    prop_0 = 0
+    prop_1 = 1
+
+    if binary_value == 0:
+        # Calculate H(Feature == 0)
+        H_0 = 0  
+
+        No = np.where(feature == 0)[0]
+        for i in No:
+            if feature[i] == labels[i]: num_0 += 1
+            else: num_1 += 1
+        if (len(No) == 0): return H_0
+        else:    
+            prop_0 = num_0 / len(No) 
+            prop_1 = num_1 / len(No)
+
+        if prop_0 == 1 or prop_1 == 1:
+            H_0 = 0     
+        else: H_0 = -(prop_0 * math.log2(prop_0)) + -(prop_1 * math.log2(prop_1))
+
+        return H_0
+
+    else:
+        # Calculate H(Feature == 1)
+        H_1 = 0
+
+        Yes = np.where(feature == 1)[0]
+        for i in Yes:
+            if feature[i] == labels[i]: num_0 += 1
+            else: num_1 += 1
+        if (len(Yes) == 0): return H_1
+        else:
+            prop_0 = num_0 / len(Yes) 
+            prop_1 = num_1 / len(Yes)
+
+        if prop_0 == 1 or prop_1 == 1:
+            H_1 = 0
+        else: H_1 = -(prop_0 * math.log(prop_0)) + -(prop_1 * math.log(prop_1))
+
+        return H_1
 
 def DT_train_binary(X, Y, max_depth):
     # Number of samples in training data
     num_samples = X.shape[0]
     # Number of features in training data
     num_features = X.shape[1]
-        
+
     # Check if X any Y have same number of samples
     # Return 0 if unequal sample number
     if X.shape[0] != Y.shape[0]:
@@ -83,16 +129,44 @@ def DT_train_binary(X, Y, max_depth):
 
     # Calculate entropy of entire dataset
     H = calculate_entropy(Y)
-    
+
+    # Create numpy array for Labels
+    labels = np.zeros(shape=(num_samples))
+    for sample in Y:
+        labels[sample] = Y[sample]
+
     # Greedy algorithm
-    for sample in X:
-        # Split training data at each feature
-        print(sample[0],sample[1],sample[2],sample[3],"|")
+    for feature in range(num_features):
+        # Create empty numpy array for storing
+        # the samples of the current feature
+        current_feature = np.zeros(shape=(num_samples))
 
-        # Calculate Information Gain at each split
-        
-        # Choose split based on maximum IG
+        # Iterate through the sample in the current feature
+        # adding each sample to current feature numpy array
+        for sample in range(num_samples):
+            current_feature[sample] = X[sample][feature]
+        print(current_feature)
 
+        # Calculate entropy of the split
+        # where feature is 0
+        H_0 = calculate_feature_entropy(current_feature, labels, 0)
+        print("H_0:",H_0)
+        # where feature is 1
+        H_1 = calculate_feature_entropy(current_feature, labels, 1)
+        print("H_1:",H_1)
+
+        # Calculate proportion of 0s and 1s in labels
+        prop_labels_0 = int(np.count_nonzero(labels == 0)) / num_samples
+        print("Prop_0:",prop_labels_0)
+        prop_labels_1 = int(np.count_nonzero(labels == 1)) / num_samples
+        print("Prop_1:",prop_labels_1)
+
+        # Calculate IG for current feature
+        IG = H - ( (prop_labels_0 * H_0) + (prop_labels_1 * H_1) )
+        print("IG:",IG)
+        print()
+
+    # Find maximum IG
         
     # Return DT as list of lists, numpy array, or class object
     return DT
