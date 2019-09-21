@@ -8,8 +8,8 @@ print()
 
 class Node:
     def __init__(self, value, IG):
-        self.left = None
-        self.right = None
+        self.no = None
+        self.yes = None
         self.value = value
         self.IG = IG
 
@@ -25,15 +25,15 @@ class Binary_Tree:
 
     def add_node(self, value, IG, node):
         if value < node.value:
-            if node.left is not None:
-                self.add_node(value, IG, node.left)
+            if node.no is not None:
+                self.add_node(value, IG, node.no)
             else:
-                node.left = Node(value, IG)
+                node.no = Node(value, IG)
         else:
-            if node.right is not None:
-                self.add_node(value, IG, node.right)
+            if node.yes is not None:
+                self.add_node(value, IG, node.yes)
             else:
-                node.right = Node(value, IG)
+                node.yes = Node(value, IG)
 
     def print_tree(self):
         if self.root is not None:
@@ -41,9 +41,9 @@ class Binary_Tree:
 
     def print_nodes(self, node):
         if node is not None:
-            self.print_nodes(node.left)
-            print(str(node.value) + ' ' + str(node.IG) + ' ')
-            self.print_nodes(node.right)
+            self.print_nodes(node.no)
+            print(str(node.value) + ' ' + str(node.IG))
+            self.print_nodes(node.yes)
 
 def calculate_entropy(Y):
     # Set of all labels
@@ -108,6 +108,31 @@ def calculate_feature_entropy(feature, labels, binary_value):
 
         return H_1
 
+def build_tree(DT, Feature_IG, labels, num_samples):
+    # Find feature with maximum IG
+    Max_IG = max(Feature_IG.values())
+    Max_feature = [k for k,v in Feature_IG.items() if v == Max_IG]
+
+    # Add feature with maximum IG to DT
+    DT.add("F"+str(Max_feature), Max_IG)
+
+    # Calculate entopy of maximum IG feature
+    feature = np.zeros(shape=(num_samples))
+    for sample in range(num_samples): feature[sample] = X[sample][int(Max_feature[0])-1]
+    
+    H_0 = calculate_feature_entropy(feature, labels, 0)
+    H_1 = calculate_feature_entropy(feature, labels, 1)
+    DT.add("_", H_0)
+    DT.add("_", H_1)
+
+    # Remove max key, value pair
+    del Feature_IG[Max_feature[0]]
+    
+    # Recursively build tree as long as Feature_IG dict
+    # is not empty
+    if len(Feature_IG) > 0:
+        build_tree(DT, Feature_IG, labels, num_samples)
+
 
 def DT_train_binary(X, Y, max_depth):
     # Number of samples and features in training data
@@ -161,25 +186,10 @@ def DT_train_binary(X, Y, max_depth):
         Feature_IG[current_index] = IG
         current_index += 1
 
-    #print(Feature_IG)
+    # Build tree
+    build_tree(DT, Feature_IG, labels, num_samples)
 
-    # Find feature with maximum IG
-    Max_IG = max(Feature_IG.values())
-    Max_feature = [k for k,v in Feature_IG.items() if v == Max_IG]
-
-    # Add feature with maximum IG to DT
-    DT.add("F"+str(Max_feature), Max_IG)
-
-    # Calculate entopy of maximum IG feature
-    feature = np.zeros(shape=(num_samples))
-    for sample in range(num_samples): feature[sample] = X[sample][2]
-    
-    H_0 = calculate_feature_entropy(feature, labels, 0)
-    DT.add("A", H_0)
-    H_1 = calculate_feature_entropy(feature, labels, 1)
-    DT.add("L", H_1)
-
-    # Return DT as list of lists, numpy array, or class object
+    # Return DT
     return DT
 
 def DT_test_binary(X, Y, DT):
