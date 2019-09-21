@@ -16,7 +16,6 @@ class Node:
 class Binary_Tree:
     def __init__(self):
         self.root = None
-        self.depth = 0
 
     def add(self, value, IG):
         if self.root == None:
@@ -162,7 +161,7 @@ def DT_train_binary(X, Y, max_depth):
         Feature_IG[current_index] = IG
         current_index += 1
 
-    print(Feature_IG)
+    #print(Feature_IG)
 
     # Find feature with maximum IG
     Max_IG = max(Feature_IG.values())
@@ -171,8 +170,14 @@ def DT_train_binary(X, Y, max_depth):
     # Add feature with maximum IG to DT
     DT.add("F"+str(Max_feature), Max_IG)
 
-    # If IG = 0, stop
-    # else, continue
+    # Calculate entopy of maximum IG feature
+    feature = np.zeros(shape=(num_samples))
+    for sample in range(num_samples): feature[sample] = X[sample][2]
+    
+    H_0 = calculate_feature_entropy(feature, labels, 0)
+    DT.add("A", H_0)
+    H_1 = calculate_feature_entropy(feature, labels, 1)
+    DT.add("L", H_1)
 
     # Return DT as list of lists, numpy array, or class object
     return DT
