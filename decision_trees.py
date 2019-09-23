@@ -135,13 +135,13 @@ def build_tree(DT, Feature_IG, labels, num_samples):
 
 
 def DT_train_binary(X, Y, max_depth):
-    # Number of samples and features in training data
-    num_samples = X.shape[0]
-    num_features = X.shape[1]
-
     # Check if X any Y have same number of samples
     # Return 0 if unequal sample number
     if X.shape[0] != Y.shape[0]: return 0
+    
+    # Number of samples and features in training data
+    num_samples = X.shape[0]
+    num_features = X.shape[1]
 
     # Create new Binary Tree for DT
     DT = Binary_Tree()
@@ -211,32 +211,6 @@ def DT_train_real_best(X_train, Y_train, X_val, Y_val):
 
 # Test Data
 '''
-Test 1
-F1 F2 F3 F4  L
-0  1  0  1 | 1
-1  1  1  1 | 1
-0  0  0  1 | 0
-
-Training Set 1
-F1 F2   L
-0  1  | 1
-0  0  | 0
-1  0  | 0
-0  0  | 0
-1  1  | 1
-
-Training Set 2
-F1 F2 F3 F4  L
-0  1  0  0 | 0
-0  0  0  1 | 1
-1  0  0  0 | 0
-0  0  1  1 | 0
-1  1  0  1 | 1
-1  1  0  0 | 0
-1  0  0  1 | 1
-0  1  0  1 | 1
-0  1  0  0 | 1
-
 Trainin Set Example
     F1 F2 F3 F4  L
 1   1  1  0  0 | 0
@@ -250,16 +224,6 @@ Trainin Set Example
 9   1  1  1  0 | 1
 10  0  0  1  1 | 0
 '''
-training_features_1 = np.array([ [0, 1, 0, 1], [1, 1, 1, 1], [0, 0, 0, 1] ])
-training_labels_1 = np.array([ [1], [1], [0] ])
-
-training_features_2 = np.array([ [0,1], [0,0], [1,0], [0,0], [1,1] ])
-training_labels_2 = np.array([ [1], [0], [0], [0], [1] ])
-
-training_features_3 = np.array([ [0,1,0,0], [0,0,0,1], [1,0,0,0], [0,0,1,1], [1,1,0,1], [1,1,0,0], [1,0,0,1], [0,1,0,1], [0,1,0,0] ])
-training_labels_3 = np.array([ [0], [1], [0], [0], [1], [0], [1], [1], [1] ])
-
-
 X = np.array([ [1,1,0,0], [1,1,1,1], [1,1,1,1], [0,0,0,1], [0,0,1,1], [0,0,1,0], [0,0,0,0], [1,0,1,0], [1,1,1,0], [0,0,1,1] ])
 Y = np.array([ [0], [1], [1], [0], [0], [1], [0], [0], [1], [0] ])
 max_depth = 2
@@ -267,4 +231,4 @@ max_depth = 2
 # Test DT_train_binary() and DT_test_binary()
 DT = DT_train_binary(X, Y, max_depth)
 DT.print_tree()
-test_acc = DT_test_binary(training_features_1, training_labels_1, DT)
+test_acc = DT_test_binary(X, Y, DT)
