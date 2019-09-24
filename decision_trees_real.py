@@ -13,8 +13,8 @@ class Real_Node:
         self.value = 0
         self.feature = 0
         self.depth = 0
-        self.left_prediction = False
-        self.right_prediction = True
+        self.left_prediction = 0
+        self.right_prediction = 1
 
 
 class Real_Binary_Tree:
@@ -28,7 +28,7 @@ class Real_Binary_Tree:
     def print_nodes(self, node):
         if node is not None:
             self.print_nodes(node.left)
-            print(str(node.value) + ' ' + str(node.feature))
+            print(str(node.value) + ' ' + str(node.feature) + ' ' + str(node.depth) + ' ' + str(node.left_prediction) + ' ' + str(node.right_prediction))
             self.print_nodes(node.right)
 
 def calculate_entropy(Y):
@@ -44,9 +44,6 @@ def calculate_entropy(Y):
     # Calculate proportion of each label
     prop_labels_0 = num_labels_0 / length
     prop_labels_1 = num_labels_1 / length
-
-    #print('prop_lables_1: {}'.format(prop_labels_1))
-    #print('prop_lables_0: {}'.format(prop_labels_0))
 
     H0 = 0
     H1 = 0
@@ -74,6 +71,7 @@ def DT_train_real(X, Y, max_depth):
     H = calculate_entropy(Y)
     # Split training data at each feature
     DT.root = Real_Node()
+    DT.root.depth = 1
     Y = Y.flatten()
     samples = []
     for i in range(Y.shape[0]):
@@ -114,8 +112,6 @@ def DT_train_real_recursive(node, sample_nums, X, Y, max_depth, H):
             p_L = len(samples_0) / len(sample_nums)
             p_R = len(samples_1) / len(sample_nums)
 
-            #print('p_r/l {}, {}'.format(p_L, p_R))
-
             # Calculate entropy after split at each side
             l_entropy = 0
             if len(labels_0) > 0:
@@ -136,7 +132,6 @@ def DT_train_real_recursive(node, sample_nums, X, Y, max_depth, H):
         # dict feature# -> best sample to split on
         best_split[i] = best
         IG.append(temp_IG[best])
-    #print('temp IG @ {}: {}'.format(i, IG))
 
 
     # Choose best feature to split on based off IG
@@ -187,7 +182,7 @@ def DT_train_real_recursive(node, sample_nums, X, Y, max_depth, H):
         else:
             node.right = Real_Node()
             node.right.depth = node.depth + 1
-            DT_train_real_recursive(node.right, left_samples, X, Y, max_depth, H)
+            DT_train_real_recursive(node.right, right_samples, X, Y, max_depth, H)
 
     if len(right_samples) == 0:
         node.right_prediction = not node.left_prediction
@@ -283,4 +278,4 @@ real_training_labels = np.array([[1], [1], [1], [0], [0], [1], [1], [0], [1], [0
 
 DT2 = DT_train_real(real_training_features, real_training_labels, max_depth)
 
-#DT2.print_tree()
+DT2.print_tree()
