@@ -1,11 +1,6 @@
 import numpy as np
 import math
 
-print("CS 691 - Project 1 - Decision Trees")
-print("Lee Easson")
-print("Kurtis Rodrigue")
-print()
-
 class Real_Node:
     def __init__(self):
         self.left = None
@@ -15,7 +10,6 @@ class Real_Node:
         self.depth = 0
         self.left_prediction = 0
         self.right_prediction = 1
-
 
 class Real_Binary_Tree:
     def __init__(self):
@@ -279,3 +273,5 @@ real_training_labels = np.array([[1], [1], [1], [0], [0], [1], [1], [0], [1], [0
 DT2 = DT_train_real(real_training_features, real_training_labels, max_depth)
 
 DT2.print_tree()
+
+#test_acc = DT_test_real(real_training_features, real_training_labels, DT2)

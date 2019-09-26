@@ -1,11 +1,6 @@
 import numpy as np
 import math
 
-print("CS 691 - Project 1 - Decision Trees")
-print("Lee Easson")
-print("Kurtis Rodrigue")
-print()
-
 class Node:
     def __init__(self, value, IG):
         self.no = None
@@ -16,6 +11,9 @@ class Node:
 class Binary_Tree:
     def __init__(self):
         self.root = None
+
+    def get_root(self):
+        return self.root
 
     def add(self, value, IG):
         if self.root == None:
@@ -133,7 +131,6 @@ def build_tree(DT, Feature_IG, labels, num_samples):
     if len(Feature_IG) > 0:
         build_tree(DT, Feature_IG, labels, num_samples)
 
-
 def DT_train_binary(X, Y, max_depth):
     # Check if X any Y have same number of samples
     # Return 0 if unequal sample number
@@ -192,43 +189,58 @@ def DT_train_binary(X, Y, max_depth):
     # Return DT
     return DT
 
+
 def DT_test_binary(X, Y, DT):
-    return 0
+    num_samples = X.shape[0]
+    predictions = []
+    for i in range(num_samples):
+        print(X[i])
+        #predictions.append(X[i][0])
+        predictions.append(DT_predict(X[i], DT))
+    
+    diff = 0
+    same = 0
+    for i in range(len(predictions)):
+        if predictions[i] == Y[i]:
+            same += 1
+        else:
+            diff += 1
+
+    accuracy = same / (same + diff)
+    return accuracy
+
+def DT_predict(X, DT):
+    return DT_predict_recursive(X, DT.get_root())
+
+def DT_predict_recursive(X, node):
+    if node.no is not None:
+        DT_predict(X, node.no)
+    else:
+        return node.IG
+
+    return
+    '''
+    if X[node.left_prediction] <= node.value:
+        if node.no:
+            DT_predict(X, node.no)
+        else:
+            return node.left_prediction
+    else:
+        if node.yes:
+            DT_predict(X, node.yes)
+        else:
+            return node.right_prediction
+    '''
 
 def DT_train_binary_best(X_train, Y_train, X_val, Y_val):
     return
 
-
-def DT_train_real(X, Y, max_depth):
-    return
-
-def DT_test_real(X, Y, DT):
-    return
-
-def DT_train_real_best(X_train, Y_train, X_val, Y_val):
-    return
-
-
-# Test Data
-'''
-Trainin Set Example
-    F1 F2 F3 F4  L
-1   1  1  0  0 | 0
-2   1  1  1  1 | 1
-3   1  1  1  1 | 1
-4   0  0  0  1 | 0
-5   0  0  1  1 | 0
-6   0  0  1  0 | 1
-7   0  0  0  0 | 0
-8   1  0  1  0 | 0
-9   1  1  1  0 | 1
-10  0  0  1  1 | 0
-'''
+# Test DT_train_binary(X, Y, max_depth) and DT_test_binary(X, Y, DT)
 X = np.array([ [1,1,0,0], [1,1,1,1], [1,1,1,1], [0,0,0,1], [0,0,1,1], [0,0,1,0], [0,0,0,0], [1,0,1,0], [1,1,1,0], [0,0,1,1] ])
 Y = np.array([ [0], [1], [1], [0], [0], [1], [0], [0], [1], [0] ])
 max_depth = 2
 
-# Test DT_train_binary() and DT_test_binary()
 DT = DT_train_binary(X, Y, max_depth)
 DT.print_tree()
 test_acc = DT_test_binary(X, Y, DT)
+print("Accuracy:",test_acc)
