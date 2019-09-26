@@ -53,7 +53,6 @@ class Real_Node:
         self.left_prediction = 0
         self.right_prediction = 1
 
-
 class Real_Binary_Tree:
     def __init__(self):
         self.root = None
@@ -67,6 +66,8 @@ class Real_Binary_Tree:
             self.print_nodes(node.left)
             print(str(node.value) + ' ' + str(node.feature) + ' ' + str(node.depth) + ' ' + str(node.left_prediction) + ' ' + str(node.right_prediction))
             self.print_nodes(node.right)
+
+
 
 def calculate_entropy(Y):
     # Set of all labels
@@ -94,7 +95,6 @@ def calculate_entropy(Y):
     # Calculate entropy
     entropy = H0 + H1
     return entropy
-
 
 def calculate_feature_entropy(feature, labels, binary_value):
     H_0 = 0
@@ -150,8 +150,7 @@ def calculate_feature_entropy(feature, labels, binary_value):
 
         return H_1
 
-
-def build_tree(DT, Feature_IG, labels, num_samples):
+def build_tree(X, DT, Feature_IG, labels, num_samples):
     # Find feature with maximum IG
     Max_IG = max(Feature_IG.values())
     Max_feature = [k for k, v in Feature_IG.items() if v == Max_IG]
@@ -174,7 +173,8 @@ def build_tree(DT, Feature_IG, labels, num_samples):
     # Recursively build tree as long as Feature_IG dict
     # is not empty
     if len(Feature_IG) > 0:
-        build_tree(DT, Feature_IG, labels, num_samples)
+        build_tree(X, DT, Feature_IG, labels, num_samples)
+
 
 
 def DT_train_binary(X, Y, max_depth):
@@ -230,19 +230,28 @@ def DT_train_binary(X, Y, max_depth):
         current_index += 1
 
     # Build tree
-    build_tree(DT, Feature_IG, labels, num_samples)
+    build_tree(X, DT, Feature_IG, labels, num_samples)
 
     # Return DT
     return DT
 
+def DT_predict_recursive(X, node):
+    if node.no is not None:
+        DT_predict(X, node.no)
+    else:
+        return node.IG
+
+    return
+
+def DT_predict(X, DT):
+    return DT_predict_recursive(X, DT)
 
 def DT_test_binary(X, Y, DT):
     num_samples = X.shape[0]
     predictions = []
     for i in range(num_samples):
-        print(X[i])
-        # predictions.append(X[i][0])
-        predictions.append(DT_predict(X[i], DT))
+        predictions.append(X[i][0])
+        #predictions.append(DT_predict(X[i], DT))
 
     diff = 0
     same = 0
@@ -255,34 +264,27 @@ def DT_test_binary(X, Y, DT):
     accuracy = same / (same + diff)
     return accuracy
 
-
-def DT_predict(X, DT):
-    return DT_predict_recursive(X, DT.get_root())
-
-
-def DT_predict_recursive(X, node):
-    if node.no is not None:
-        DT_predict(X, node.no)
-    else:
-        return node.IG
-
-    return
-    '''
-    if X[node.left_prediction] <= node.value:
-        if node.no:
-            DT_predict(X, node.no)
-        else:
-            return node.left_prediction
-    else:
-        if node.yes:
-            DT_predict(X, node.yes)
-        else:
-            return node.right_prediction
-    '''
-
-
 def DT_train_binary_best(X_train, Y_train, X_val, Y_val):
-    return
+    # Intialize list of decision trees and depth    
+    DTs = []
+    depth = 0
+
+    # make unique trees, iterative depth
+    while True:
+        # Train binary tree with current depth
+        DTs.append(DT_train_binary(X_train, Y_train, depth))
+        depth += 1
+        
+        # Test accuracy of current tree
+        if DT_test_binary(X_val, Y_val, DTs[depth-1]) == 1:
+            return DTs[depth-1]
+
+        # If the accuracy does not change 
+        # return the tree
+        if len(DTs) > 1:
+            if DT_test_binary(X_val, Y_val, DTs[depth-1]) == DT_test_binary(X_val, Y_val, DTs[depth-2]):
+                return DTs[depth-1]
+
 
 
 def DT_train_real(X, Y, max_depth):
@@ -290,7 +292,6 @@ def DT_train_real(X, Y, max_depth):
     # Return 0 if unequal row number
     if X.shape[0] != Y.shape[0]:
         return 0
-
 
     # Create new Binary Tree for DT
     DT = Real_Binary_Tree()
@@ -417,6 +418,22 @@ def DT_train_real_recursive(node, sample_nums, X, Y, max_depth, H):
         node.left_prediction = not node.right_prediction
     return
 
+def DT_predict_real_recursive(X, node):
+    if X[node.feature] <= node.value:
+        if node.left:
+            DT_predict_real(X, node.left)
+        else:
+            return node.left_prediction
+    else:
+        if node.right:
+            DT_predict_real(X, node.right)
+        else:
+            return node.right_prediction
+    return
+
+def DT_predict_real(X, DT):
+    return DT_predict_real_recursive(X, DT.root)
+
 def DT_test_real(X, Y, DT):
     predictions = []
     for i in range(X.shape[0]):
@@ -432,22 +449,6 @@ def DT_test_real(X, Y, DT):
 
     accuracy = same / (same + diff)
     return accuracy
-
-def DT_predict_real(X, DT):
-    return DT_predict_real_recursive(X, DT.root)
-
-def DT_predict_real_recursive(X, node):
-    if X[node.feature] <= node.value:
-        if node.left:
-            DT_predict_real(X, node.left)
-        else:
-            return node.left_prediction
-    else:
-        if node.right:
-            DT_predict_real(X, node.right)
-        else:
-            return node.right_prediction
-    return
 
 def DT_train_real_best(X_train, Y_train, X_val, Y_val):
     DTs = []

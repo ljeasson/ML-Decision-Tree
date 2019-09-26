@@ -1,34 +1,50 @@
 import numpy as np
-
-# Binary Test Data
 import decision_trees as dt
-'''
-Training Set Example
-    F1 F2 F3 F4  L
-1   1  1  0  0 | 0
-2   1  1  1  1 | 1
-3   1  1  1  1 | 1
-4   0  0  0  1 | 0
-5   0  0  1  1 | 0
-6   0  0  1  0 | 1
-7   0  0  0  0 | 0
-8   1  0  1  0 | 0
-9   1  1  1  0 | 1
-10  0  0  1  1 | 0
-'''
 
-# Test DT_train_binary(X, Y, max_depth) and DT_test_binary(X, Y, DT)
-X = np.array([ [1,1,0,0], [1,1,1,1], [1,1,1,1], [0,0,0,1], [0,0,1,1], [0,0,1,0], [0,0,0,0], [1,0,1,0], [1,1,1,0], [0,0,1,1] ])
-Y = np.array([ [0], [1], [1], [0], [0], [1], [0], [0], [1], [0] ])
-max_depth = 2
+#Training Set 1:
+X_train = np.array([ [0,1], [0,0], [1,0], [0,0], [1,1] ])
+Y_train = np.array([ [1], [0], [0], [0], [1] ])
+#Validation Set 1:
+X_val = np.array([ [0,0], [0,1], [1,0], [1,1] ])
+Y_val = np.array([ [0], [1], [0], [1] ])
+#Testing Set 1:
+X = np.array([ [0,0], [0,1], [1,0], [1,1] ])
+Y = np.array([ [1], [1], [0], [1] ])
 
-#DT = dt.DT_train_binary(X, Y, max_depth)
-#test_acc = dt.DT_test_binary(X, Y, DT)
+DT = dt.DT_train_binary(X_train, Y_train, 2)
+#DT.print_tree()
+test_acc = dt.DT_test_binary(X, Y, DT)
+print(test_acc)
+
+DT = dt.DT_train_binary_best(X_train, Y_train, X_val, Y_val)
+#DT.print_tree()
+test_acc = dt.DT_test_binary(X, Y, DT)
+print(test_acc)
+
+print()
+
+#Training Set 2:
+X_train = np.array([ [0,1,0,0], [0,0,0,1], [1,0,0,0], [0,0,1,1], [1,1,0,1], [1,1,0,0], [1,0,0,1], [0,1,0,1], [0,1,0,0] ])
+Y_train = np.array([ [0], [1], [0], [0], [1], [0], [1], [1], [1] ])
+#Validation Set 1:
+X_val = np.array([ [1,0,0,0], [0,0,1,1], [1,1,0,1], [1,1,0,0], [1,0,0,1], [0,1,0,0] ])
+Y_val = np.array([ [0], [0], [1], [0], [1], [1] ])
+#Testing Set 1:
+X = np.array([ [0,1,0,0], [0,0,0,1], [1,0,0,0], [0,0,1,1], [1,1,0,1], [1,1,0,0], [1,0,0,1], [0,1,0,1], [0,1,0,0] ])
+Y = np.array([ [1], [1], [0], [0], [1], [0], [1], [1], [1] ])
+
+DT = dt.DT_train_binary(X_train, Y_train, 2)
+#DT.print_tree()
+test_acc = dt.DT_test_binary(X, Y, DT)
+print(test_acc)
+
+DT = dt.DT_train_binary_best(X_train, Y_train, X_val, Y_val)
+#DT.print_tree()
+test_acc = dt.DT_test_binary(X, Y, DT)
+print(test_acc)
 
 
 # Real Test Data
-import decision_trees_real as dtr
-
 real_training_features = np.array([
      [4.8, 3.4, 1.9, 0.2],
      [5, 3, 1.6, 1.2],
@@ -50,5 +66,5 @@ real_training_features = np.array([
 real_training_labels = np.array([[1], [1], [1], [0], [0], [1], [1], [0], [1], [0], [1], [0], [0], [0], [0], [0]])
 
 # Test DT_train_real(X, Y, max_depth) and DT_test_real(X, Y, DT)
-DTR = dtr.DT_train_real(real_training_features, real_training_labels, max_depth)
-test_acc_real = dtr.DT_test_real(real_training_features, real_training_labels, DTR)
+#DTR = dt.DT_train_real(real_training_features, real_training_labels, max_depth)
+#test_acc_real = dt.DT_test_real(real_training_features, real_training_labels, DTR)
