@@ -66,5 +66,11 @@ real_training_features = np.array([
 real_training_labels = np.array([[1], [1], [1], [0], [0], [1], [1], [0], [1], [0], [1], [0], [0], [0], [0], [0]])
 
 # Test DT_train_real(X, Y, max_depth) and DT_test_real(X, Y, DT)
-#DTR = dt.DT_train_real(real_training_features, real_training_labels, max_depth)
-#test_acc_real = dt.DT_test_real(real_training_features, real_training_labels, DTR)
+DTR = dt.DT_train_real(real_training_features, real_training_labels, 4)
+DTR.print_tree()
+test_acc_real = dt.DT_test_real(real_training_features, real_training_labels, DTR)
+
+DTR2 = dt.DT_train_real_best(real_training_features, real_training_labels, real_training_features, real_training_labels)
+test_acc_real = dt.DT_test_real(real_training_features, real_training_labels, DTR2)
+DTR2.print_tree()
+

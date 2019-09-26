@@ -421,15 +421,14 @@ def DT_train_real_recursive(node, sample_nums, X, Y, max_depth, H):
 def DT_predict_real_recursive(X, node):
     if X[node.feature] <= node.value:
         if node.left:
-            DT_predict_real(X, node.left)
+            return DT_predict_real_recursive(X, node.left)
         else:
             return node.left_prediction
     else:
         if node.right:
-            DT_predict_real(X, node.right)
+            return DT_predict_real_recursive(X, node.right)
         else:
             return node.right_prediction
-    return
 
 def DT_predict_real(X, DT):
     return DT_predict_real_recursive(X, DT.root)
@@ -437,7 +436,7 @@ def DT_predict_real(X, DT):
 def DT_test_real(X, Y, DT):
     predictions = []
     for i in range(X.shape[0]):
-        predictions.append(DT_predict_real(X[i], DT.root))
+        predictions.append(DT_predict_real(X[i], DT))
 
     diff = 0
     same = 0
@@ -462,6 +461,6 @@ def DT_train_real_best(X_train, Y_train, X_val, Y_val):
         if DT_test_real(X_val, Y_val, DTs[i-1]) == 1:
             return DTs[i-1]
         # if the accuracy does not change with an increase in depth, return the tree
-        if len(DTs) > 1:
+        if len(DTs) > 2:
             if DT_test_real(X_val, Y_val, DTs[i-1]) == DT_test_real(X_val, Y_val, DTs[i-2]):
                 return DTs[i-1]
